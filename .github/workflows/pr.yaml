@@ -34,8 +34,5 @@ jobs:
           coverage: ${{ steps.unit.outputs.coverage }}
         run: |
           echo "COVERAGE: $coverage"
-          is_greater=$(echo "$coverage $baeline_coverage" | awk 'BEGIN { print ($1 >= $2) ? "1" : "0" }')
-
-          if [[ $is_greater -eq 0 ]]; then
-            exit 0
-          fi 
+          is_greater=$(echo "$coverage $baeline_coverage" | awk 'BEGIN { print ($1 >= $2) ? "0" : "1" }')
+          exit $is_greater
