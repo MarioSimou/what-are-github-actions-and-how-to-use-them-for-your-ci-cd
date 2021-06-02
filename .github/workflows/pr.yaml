@@ -1,0 +1,42 @@
+name: PR Pipeline
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  pr:
+    name: Pull request
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16.2'
+      
+      - name: Tools versions
+        run: |
+          go version   
+
+      - name: Run Vet
+        run: |
+          make vet
+
+      - name: Run Unit Tests
+        id: unit
+        run: |
+          make unit
+          echo "::set-output name=coverage::$(make unit | egrep '[0-9]+.[0-9]+%' | egrep '[0-9]+.[0-9]+' )"
+
+      - name: Run Code Coverage
+        env:
+          baseline_coverage: 85.0
+          coverage: ${{ steps.unit.outputs.coverage }}
+        run: |
+          echo "COVERAGE: $coverage"
+          is_greater=$(echo "$coverage $baeline_coverage" | awk 'BEGIN { print ($1 >= $2) ? "1" : "0" }')
+
+          if [[ $is_greater -eq 0 ]]; then
+            exit 0
+          fi 
