@@ -1,9 +1,12 @@
 name: Master Pipeline
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   pr:
-    name: Masster
+    name: Master
     runs-on: ubuntu-20.04
     timeout-minutes: 5
     steps:
