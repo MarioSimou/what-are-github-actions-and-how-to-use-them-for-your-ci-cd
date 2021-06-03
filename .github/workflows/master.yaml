@@ -42,8 +42,7 @@ jobs:
     needs: [build]
     timeout-minutes: 10
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1

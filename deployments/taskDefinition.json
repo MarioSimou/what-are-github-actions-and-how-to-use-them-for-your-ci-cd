@@ -1,0 +1,32 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "hello",
+      "image": "644015966802.dkr.ecr.us-east-1.amazonaws.com/hello",
+      "cpu": 256,
+      "memory": 512,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [],
+      "mountPoints": [],
+      "volumesFrom": []
+    }
+  ],
+  "family": "hello-definition",
+  "taskRoleArn": "arn:aws:iam::644015966802:role/ecs_role",
+  "executionRoleArn": "arn:aws:iam::644015966802:role/ecs_role",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "placementConstraints": [],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512"
+}
