@@ -5,8 +5,8 @@ on:
       - master
 
 jobs:
-  pr:
-    name: Master
+  test:
+    name: Test pipeline
     runs-on: ubuntu-20.04
     timeout-minutes: 5
     steps:
@@ -39,10 +39,11 @@ jobs:
   deployment:
     name: Deployment
     runs-on: ubuntu-20.04
-    needs: [build]
+    needs: [test]
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -52,23 +53,23 @@ jobs:
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       
       - name: Build Docker image
-        environment:
-          IMAGE_TAG: ${{ secret.ECR_REGISTRY }}:${{ github.sha }}
         id: docker_build_step
+        env:
+          IMAGE_TAG: ${{ secrets.ECR_REGISTRY }}:${{ github.sha }}
         run: |
           docker build -t hello:latest -f Dockerfile .
           docker tag hello:latest ${IMAGE_TAG}
           docker push ${IMAGE_TAG}
           echo "::set-output name=image_tag::${IMAGE_TAG}"
 
-      - name: aws-actions/amazon-ecs-render-task-definition@v1
+      - name: Update Task Definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: task_definition_step        
         with:
-          task-definition: hello-definition
+          task-definition: ./deployments/taskDefinition.json
           container-name: hello
           image: ${{ steps.docker_build_step.outputs.image_tag }}
 
